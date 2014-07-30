@@ -20,21 +20,37 @@ from utils import Extract_feature
 import time
 import cPickle
 
-""" 
+"""
 We choose the Sample3 as the template...
 A bit random
+
+1) 'Step1_3DCNN_template.py' --> extract template
+
+2) 'Step1_3DCNN_batch.py' and'Step1_3DCNN_neutral_batch.py' --> extract normalized resize images using template matching method (could also be the 'Step1_3DCNN_normalize_by_sk.py' and 'Step1_3DCNN_sk_normlize_neutral.py' using skeleton for normalization
+
+3) 'Step1_transition_matrix.py' --> extract Transitional Matrix and Prior for Hidden Markov Models
+
+4) 'Main_3DCNN.py' --> the main file for training the network.
+
 """
 # Data folder (Training data)
 print("Extracting the training files")
-data=os.path.join("./train_data\\")
+data=os.path.join("./train_data/Train1\\")
 # Get the list of training samples
 samples=os.listdir(data)
 STATE_NO = 10
 
+# pre-allocating the memory
+Feature_all =  numpy.zeros(shape=(90, 90, 4, 100000), dtype=numpy.uint8 )
+Targets = numpy.zeros(shape=(100000, 1), dtype=numpy.uint8)
+cuboid_count = 0
+batch_num = 0
+
 
 for file_count, file in enumerate(samples):
-    time_tic = time.time()      
-    if (file_count>2):
+    #print file_count, file
+    time_tic = time.time()
+    if (file_count>=0):
         print("\t Processing file " + file)
         # Create the object to access the sample
         smp=GestureSample(os.path.join(data,file))
@@ -47,12 +63,12 @@ for file_count, file in enumerate(samples):
         for gesture in gesturesList:
             gestureID,startFrame,endFrame=gesture
             cuboid = numpy.zeros(( 90, 90, endFrame-startFrame+1), numpy.uint8)
-            frame_count_temp = 0 
+            frame_count_temp = 0
             for x in range(startFrame, endFrame):
                 img = smp.getDepth3DCNN(x, ratio=0.25)
                 cuboid[:, :, frame_count_temp] = img
                 frame_count_temp +=1
-  
+            cuboid_count = 1 #jminyu added
             fr_no = endFrame-startFrame+1
             for frame in range(fr_no-3):
                 Feature_all[:,:,:,cuboid_count] = cuboid[:,:, frame:frame+4]
@@ -61,9 +77,9 @@ for file_count, file in enumerate(samples):
                 cuboid_count += 1
         # ###############################################
         ## delete the sample
-        del smp        
+        del smp
         print "Elapsed time %d sec" % int(time.time() - time_tic)
-                                          
+
 
         if(not file_count%50 and file_count>0):
             random_idx = numpy.random.permutation(range(cuboid_count))
@@ -71,20 +87,22 @@ for file_count, file in enumerate(samples):
             print "batch: %d" % batch_num
             data_temp = Feature_all[:,:,:,random_idx[:]]
             data_id = Targets[random_idx[:]]
-            
+
             save_path= os.path.join(save_dir,'data_batch_'+str(batch_num))
             out_file = open(save_path, 'wb')
-            dic = {'batch_label':['batch 1 of'+ str(batch_num)], 'data':data_temp, 
+            dic = {'batch_label':['batch 1 of'+ str(batch_num)], 'data':data_temp,
                             'data_id':data_id}
             cPickle.dump(dic, out_file)
             out_file.close()
 
+            batch_num += 1
+'''
             # pre-allocating the memory
             batch_num += 1
             Feature_all =  numpy.zeros(shape=(90, 90, 4, 100000), dtype=numpy.uint8 )
             Targets = numpy.zeros(shape=(100000, 1), dtype=numpy.uint8)
             cuboid_count = 0
-
+'''
 
 #data_mean = data_temp.mean(axis=3)
 #dic = {'data_dim': 90*90*4,'data_in_rows':True, 'data_mean': data_mean}
@@ -92,4 +110,3 @@ for file_count, file in enumerate(samples):
 #out_file = open(file_name, 'wb')
 #cPickle.dump(dic, out_file)
 #out_file.close()
-

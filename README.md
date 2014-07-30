@@ -1,9 +1,11 @@
 Purpose
 =============
-Gesture recognition using 3DCNN & HMM 
+This is the code the challenge"Chalearn Looking at People 2014“.
 ******************************************************************************************************
-original source code devloped by Di WU: stevenwudi@gmail.com, 2015/05/27
-modified by J.M. Yu : jmyu@gist.ac.kr
+Gist:3DCNN(3D Convolutional Neural Networks) + Hidden Markov Networks
+******************************************************************************************************
+by Di WU: stevenwudi@gmail.com, 2015/05/27
+
 
 
 Disclaimer

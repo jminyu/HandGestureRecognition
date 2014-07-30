@@ -18,6 +18,7 @@ import numpy
 from PIL import Image
 
 
+
 def gesture_overlap_csv(csvpathgt, csvpathpred, seqlenght, begin_add, end_add):
     """ Evaluate this sample agains the ground truth file """
     maxGestures=20

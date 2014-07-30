@@ -24,7 +24,7 @@ from scipy.misc import imresize
     Access the sample information to learn a model. """
 # Data folder (Training data)
 print("Extracting the training files")
-data=os.path.join("./train_data\\")
+data=os.path.join("./train_data/Train1\\")
 # Get the list of training samples
 samples=os.listdir(data)
 
